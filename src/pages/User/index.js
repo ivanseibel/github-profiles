@@ -3,7 +3,8 @@ import { Text, View } from 'react-native';
 
 // import { Container } from './styles';
 
-export default function User() {
+export default function User(props) {
+  console.tron.log(props);
   return (
     <View>
       <Text>User</Text>

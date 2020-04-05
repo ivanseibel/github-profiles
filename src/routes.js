@@ -31,9 +31,7 @@ function Routes() {
         <Stack.Screen
           name="User"
           component={User}
-          options={{
-            title: 'Detalhes',
-          }}
+          options={({ route }) => ({ title: route.params.user.name })}
         />
       </Stack.Navigator>
     </NavigationContainer>

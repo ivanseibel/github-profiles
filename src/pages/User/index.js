@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-// TODO: Add infinite scroll with automatic pagination
 // TODO: Add pull to refresh
 // TODO: Add a link to open starred repository in a Webview
 // TODO: When get an api error, show message in order to starred list
@@ -37,16 +36,31 @@ export default class User extends Component {
     loading: true,
     page: 1,
     perPage: 10,
+    refreshing: false,
+    paginating: false,
+    onlyOnePage: true,
   };
 
   async componentDidMount() {
-    await this.handleLoadStarred();
-    this.setState({ loading: false });
+    await this.loadStarred();
+    await this.setState({ loading: false });
   }
 
-  handleLoadStarred = async () => {
-    const { page, perPage, stars } = this.state;
-    const { route, navigation } = this.props;
+  loadStarred = async () => {
+    const {
+      page,
+      perPage,
+      stars,
+      loading,
+      refreshing,
+      paginating,
+    } = this.state;
+
+    if (!loading && !refreshing && !paginating) {
+      return;
+    }
+
+    const { route } = this.props;
     const { user } = route.params;
 
     try {
@@ -56,20 +70,44 @@ export default class User extends Component {
           per_page: perPage,
         },
       });
-      this.setState({
+
+      const { link } = response.headers;
+
+      await this.setState({
         stars: [...stars, ...response.data],
         loading: false,
-        page: page + 1,
+        onlyOnePage: !link,
       });
     } catch (error) {
-      navigation.navigate('Main');
+      // do nothing for now
     }
+  };
+
+  loadMore = async () => {
+    const { page, onlyOnePage } = this.state;
+
+    if (!onlyOnePage) {
+      await this.setState({ page: page + 1, paginating: true });
+      await this.loadStarred();
+      await this.setState({ paginating: false });
+    }
+  };
+
+  refreshStarred = async () => {
+    await this.setState({
+      page: 1,
+      refreshing: true,
+      stars: [],
+    });
+
+    await this.loadStarred();
+    await this.setState({ refreshing: false });
   };
 
   render() {
     const { route } = this.props;
     const { user } = route.params;
-    const { stars, loading } = this.state;
+    const { stars, loading, refreshing } = this.state;
 
     return (
       <Container>
@@ -84,7 +122,9 @@ export default class User extends Component {
         ) : (
           <Stars
             onEndReachedThreshold={0.2}
-            onEndReached={this.handleLoadStarred}
+            onEndReached={this.loadMore}
+            onRefresh={this.refreshStarred}
+            refreshing={refreshing}
             data={stars}
             keyExtractor={(star) => String(star.id)}
             renderItem={({ item }) => (

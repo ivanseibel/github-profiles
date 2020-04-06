@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-// TODO: Add pull to refresh
-// TODO: Add a link to open starred repository in a Webview
 // TODO: When get an api error, show message in order to starred list
 
 import {
@@ -71,6 +69,7 @@ export default class User extends Component {
         },
       });
 
+      // If have one page, link property will be undefined
       const { link } = response.headers;
 
       await this.setState({
@@ -104,6 +103,18 @@ export default class User extends Component {
     await this.setState({ refreshing: false });
   };
 
+  handleNavigateToRepo = (data) => {
+    const { navigation } = this.props;
+    const { name, html_url: htmlUrl } = data;
+
+    navigation.navigate('Repository', {
+      repository: {
+        name,
+        htmlUrl,
+      },
+    });
+  };
+
   render() {
     const { route } = this.props;
     const { user } = route.params;
@@ -131,7 +142,13 @@ export default class User extends Component {
               <Starred>
                 <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
                 <Info>
-                  <Title>{item.name}</Title>
+                  <Title
+                    onPress={() => {
+                      this.handleNavigateToRepo(item);
+                    }}
+                  >
+                    {item.name}
+                  </Title>
                   <Author>{item.owner.login}</Author>
                 </Info>
               </Starred>

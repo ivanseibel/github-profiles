@@ -19,6 +19,9 @@ import {
 } from './styles';
 import api from '../../services/api';
 
+// TODO: Add new feature to delete profiles
+// TODO: Change color scheme of all screens
+
 export default class Main extends Component {
   static propTypes = {
     navigation: PropTypes.shape({
@@ -103,8 +106,8 @@ export default class Main extends Component {
             {loading ? (
               <ActivityIndicator color="FFF" />
             ) : (
-                <Icon name="add" size={20} color="#FFF" />
-              )}
+              <Icon name="add" size={20} color="#FFF" />
+            )}
           </SubmitButton>
         </Form>
 

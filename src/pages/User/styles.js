@@ -76,3 +76,10 @@ export const Author = styled.Text`
   color: #666;
   margin-top: 2px;
 `;
+
+export const Loading = styled.ActivityIndicator.attrs((props) => ({
+  animating: props.loading,
+  hidesWhenStopped: true,
+}))`
+  margin-top: 20px;
+`;

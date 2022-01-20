@@ -26,7 +26,7 @@ function Routes() {
           name="Main"
           component={Main}
           options={{
-            title: 'Usuários',
+            title: 'Users',
           }}
         />
         <Stack.Screen
